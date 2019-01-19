@@ -3,6 +3,7 @@ package com.tabletoptools.notekeeper;
 import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,18 +11,26 @@ import java.util.List;
  * Created by Jim.
  */
 
-public final class CourseInfo {
+public final class CourseInfo implements Parcelable {
     private final String mCourseId;
     private final String mTitle;
     private final List<ModuleInfo> mModules;
 
-    public CourseInfo(String courseId, String title, List<ModuleInfo> modules) {
+    CourseInfo(String courseId, String title, List<ModuleInfo> modules) {
         mCourseId = courseId;
         mTitle = title;
         mModules = modules;
     }
 
-    public String getCourseId() {
+    private CourseInfo(Parcel in) {
+        mCourseId = in.readString();
+        mTitle = in.readString();
+        mModules = new ArrayList<>();
+        in.readTypedList(mModules, ModuleInfo.CREATOR);
+    }
+
+
+    String getCourseId() {
         return mCourseId;
     }
 
@@ -47,7 +56,7 @@ public final class CourseInfo {
             mModules.get(i).setComplete(status[i]);
     }
 
-    public ModuleInfo getModule(String moduleId) {
+    ModuleInfo getModule(String moduleId) {
         for(ModuleInfo moduleInfo: mModules) {
             if(moduleId.equals(moduleInfo.getModuleId()))
                 return moduleInfo;
@@ -55,6 +64,7 @@ public final class CourseInfo {
         return null;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return mTitle;
@@ -76,4 +86,29 @@ public final class CourseInfo {
         return mCourseId.hashCode();
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mCourseId);
+        dest.writeString(mTitle);
+        dest.writeTypedList(mModules);
+    }
+
+    public static final Parcelable.Creator<CourseInfo> CREATOR =
+            new Parcelable.Creator<CourseInfo>() {
+
+                @Override
+                public CourseInfo createFromParcel(Parcel source) {
+                    return new CourseInfo(source);
+                }
+
+                @Override
+                public CourseInfo[] newArray(int size) {
+                    return new CourseInfo[size];
+                }
+            };
 }
