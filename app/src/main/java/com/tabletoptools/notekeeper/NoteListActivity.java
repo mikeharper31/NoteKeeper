@@ -19,23 +19,22 @@ public class NoteListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
+                    startActivity(new Intent(NoteListActivity.this, NoteActivity.class));
+                }
         });
 
         initialiseDisplayContent();
     }
 
     private void initialiseDisplayContent() {
-        ListView listNotes = findViewById(R.id.list_notes);
+        final ListView listNotes = findViewById(R.id.list_notes);
         List<NoteInfo> notes = DataManager.getInstance().getNotes();
         ArrayAdapter<NoteInfo> adapterNotes = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notes);
         listNotes.setAdapter(adapterNotes);
@@ -44,6 +43,8 @@ public class NoteListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
+                NoteInfo note = (NoteInfo)listNotes.getItemAtPosition(position);
+                intent.putExtra(NoteActivity.NOTE_INFO, note);
                 startActivity(intent);
             }
 
